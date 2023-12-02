@@ -10,12 +10,16 @@
       - [How to get list of users?](#list)
       - [How to delete a user?](#delete)
       - [How to update a user?](#update)
-  - [Category (for admin user)](#category)
-    - [How to create a new category?](#create-category)
-    - [How to get a list of categories?](#list-category)
-    - [How to delete a category?](#delete-category)
-    - [How to update a category?](#update-category)
-  - [Deployment](#triangular_flag_on_post-deployment)
+    - [Category (for admin user)](#category)
+      - [How to create a new category?](#create-category)
+      - [How to get a list of categories?](#list-category)
+      - [How to delete a category?](#delete-category)
+      - [How to update a category?](#update-category)
+    - [Menus](#menus)
+      - [How to create a menu?](#create-menu)
+      - [How to get a list of menus?](#list-menus)
+      - [How to delete a menu?](#delete-menu)
+      - [How to update a menu?](#update-menu)
 - [👥 Authors](#authors)
 - [🔭 Future Features](#future-features)
 - [🤝 Contributing](#contributing)
@@ -182,9 +186,147 @@ If you successfuly update a category the API will return
     "number_of_menus": 5
 }
 ```
+If you want to get a number of menus which is belongs to a give category, you can use `number_of_menus` property.
 
 > Note: You should pass a `category_id` you want to update
-### Menus
+### Menus <a name="menus"></a>
+Menus are a list of items the cafeteria will provide to a customer.
+#### How to create a menu? <a name="create-menu"></a>
+To create a menu you need to send a `post` request to `/api/v1/menus` and the body of the request should looks like.
+
+```json
+{
+    "menu":{
+       "name": "Tegabino",
+       "price": 120,
+       "user_id": 14,
+       "category_id": 2,
+       "pin_to_top": true
+ }
+}
+```
+> Note: `Except` `pin_to_top` all attributes are `required`.
+
+The `user_id` in a menu indicates the person responsible for preparing the registered menu. When a new order for this menu is placed, a notification about the order will be sent directly to the user associated with the menu.
+
+In simpler terms, the user associated with the `user_id` will be alerted and tasked with fulfilling the order when a new order for their menu is created.
+
+The `category_id` parameter specifies the category to which a particular menu belongs. Whenever a new menu is added, the `number_of_menus` property of the corresponding category is incremented.
+
+If you successfully created a menu the API will return 
+
+```json
+{
+    "id": 27,
+    "name": "Tegabino",
+    "price": 120.0,
+    "pin_to_top": true,
+    "created_by": "Munit Amare",
+    "category": {
+        "id": 2,
+        "name": "Berger",
+        "status": "active",
+        "number_of_menus": 7
+    },
+    "user": {
+        "id": 14,
+        "first_name": "Biniam",
+        "last_name": "Amare",
+        "role": "food"
+    }
+}
+```
+#### How to get a list of menu? <a name="list-menus"></a>
+
+To get a list of menus send `get` request to `/api/v1/menus` and the API response looks like
+
+```json
+{
+    "Berger": [
+        {
+            "id": 13,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "category": {
+                "id": 2,
+                "name": "Berger"
+            },
+            "user": {
+                "id": 14,
+                "first_name": "Biniam",
+                "last_name": "Amare"
+            }
+        }
+    ],
+    "Food": [
+        {
+            "id": 18,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": false,
+            "category": {
+                "id": 3,
+                "name": "Food"
+            },
+            "user": {
+                "id": 14,
+                "first_name": "Biniam",
+                "last_name": "Amare"
+            }
+        }
+    ]
+}
+```
+
+The API organizes the returned menus according to their respective categories and sorts them based on the `pin_to_top` property.
+
+#### How to delete a menu? <a name="delete-menu"></a>
+
+To delete a menu send a `delete` request to `/api/v1/menus/{menu_id}`
+
+If the menu successfully deleted the API will return 
+```json
+{
+    "status": "done",
+    "message": "Record deleted successfully"
+}
+```
+> Note: Remember you must provide a `menu_id` you want to delete.
+
+#### How to update a menu? <a name="update-menu"></a>
+
+To update a menu send a `put/patch` request to `/api/v1/menus/{menu_id}` and the request body will looks like
+```json
+{
+    "menu":{
+       .....
+       "name": "Ayent"
+       .....
+}
+}
+```
+
+If you successfully update a menu the API will return 
+
+```json
+{
+    "name": "Ayent",
+    "id": 10,
+    "price": 100.0,
+    "pin_to_top": true,
+    "category": {
+        "id": 2,
+        "name": "Berger"
+    },
+    "user": {
+        "id": 14,
+        "first_name": "Biniam",
+        "last_name": "Amare"
+    }
+}
+```
+> Note: Remember you must provide a `menu_id` you want to delete.
 ### Orders 
 ### How to get active orders?
 ### 
