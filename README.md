@@ -1,13 +1,15 @@
 # 📗 Table of Contents
 
-- [📖 API Documentaion](#kibur-api)
-  - [🛠 Data Format](#data-format)
-    - [Tech Stack](#tech-stack)
-    - [Key Features](#key-features)
-- [💻 Getting Started](#getting-started)
-  - [Setup](#setup)
-  - [Prerequisites](#prerequisites)
-  - [Install](#install)
+- [API Documentaion](#kibur-api)
+  - [Data Format](#data-format)
+  - [Endponts](#endpoint)
+    - [Authentication](#auth)
+      - [How to get the API KEY? ](#api-key)
+    - [Users](#user)
+      - [How create user account?](#create)
+      - [How to get list of users?](#list)
+      - [How to delete a user?](#delete)
+      - [How to update a user?](#update)
   - [Usage](#usage)
   - [Run tests](#run-tests)
   - [Deployment](#triangular_flag_on_post-deployment)
@@ -26,9 +28,9 @@ For every `POST` and `PUT/PATCH` requests, you can provide data in JSON format. 
  headers: {..., "Authorization" => "Bearer {API_KEY}"}
 ```
 
-## API Endpoints
-### Authentication
-#### How to get the API KEY?
+## API Endpoints <a name="endpoint"></a>
+### Authentication <a name="auth"></a>
+#### How to get the API KEY? <a name="api-key"></a>
 To get the api key you need to authenticate using `user_name` and `password` and send `get` request to
 
  `/api/v1/user/login`
@@ -47,8 +49,8 @@ To get the api key you need to authenticate using `user_name` and `password` and
  ```
 
 
-### Users 
- #### How create user account?
+### Users <a name="user"></a>
+ #### How create user account?<a name="create"></a>
 To establish a new user account first you need to login as `admin` only admin user can create a user account, and a `POST` request must be sent to the `/api/v1/users` endpoint. Mandatory attributes include `first_name, last_name, user_name, role, and password`.
 
 The input format looks like 
@@ -63,7 +65,7 @@ The input format looks like
     }
 }
 ```
-### How to get list of users?
+### How to get list of users? <a name="list"></a>
 You can send `get` request to `api/v1/users` and the API returns Array of user object like 
 
 ```json
@@ -85,7 +87,7 @@ You can send `get` request to `api/v1/users` and the API returns Array of user o
 ]
 
 ```
-### How to delete a user?
+### How to delete a user? <a name="delete"></a>
 
 You can send `delete` requests to `/api/v1/users/{user_id}`. Remember you must provide a user_id you wan to delete. If you successfully delete a user you will get a message like
 
@@ -95,7 +97,7 @@ You can send `delete` requests to `/api/v1/users/{user_id}`. Remember you must p
     "message": "Record deleted successfully"
 }
 ```
-### How to update a user?
+### How to update a user? <a name="update"></a>
 You can send `put/patch` requests to `/api/v1/users/{user_id}` and the body should be a json formated data. For example to change a password of a user the body should looks like
 ```json
 {
@@ -106,8 +108,6 @@ You can send `put/patch` requests to `/api/v1/users/{user_id}` and the body shou
 ```
 > Note: Remember you must provide a `user_id` you want to update.
 
- 
-### Authentication
 ### Categories
 ### Menus
 ### Orders 
