@@ -5,13 +5,16 @@
   - [Endponts](#endpoint)
     - [Authentication](#auth)
       - [How to get the API KEY? ](#api-key)
-    - [Users](#user)
+    - [Users management (for admin user)](#user)
       - [How create user account?](#create)
       - [How to get list of users?](#list)
       - [How to delete a user?](#delete)
       - [How to update a user?](#update)
-  - [Usage](#usage)
-  - [Run tests](#run-tests)
+  - [Category (for admin user)](#category)
+    - [How to create a new category?](#create-category)
+    - [How to get a list of categories?](#list-category)
+    - [How to delete a category?](#delete-category)
+    - [How to update a category?](#update-category)
   - [Deployment](#triangular_flag_on_post-deployment)
 - [👥 Authors](#authors)
 - [🔭 Future Features](#future-features)
@@ -108,7 +111,79 @@ You can send `put/patch` requests to `/api/v1/users/{user_id}` and the body shou
 ```
 > Note: Remember you must provide a `user_id` you want to update.
 
-### Categories
+### Categories <a name="category"></a>
+#### How to create a new category? <a name="create-category"></a>
+Only admin user can create a new category. To create a new category you can send `post` request to `/api/v1/categories` and the body of the request looks like 
+```json
+{
+    "category":{
+       "name": "Berger"
+  }
+}
+```
+> Note: `name` attribue is a mandatory parameter.
+
+If you successfully create a category the api will return 
+```json
+{
+    "id": 6,
+    "name": "Berger",
+    "status": "active",
+    "number_of_menus": null
+}
+```
+#### How to get a list of categories? <a name="list-category"></a>
+To get a list of categories a `get` request to `/api/v1/categories`. The API return a list of user data looks like below 
+
+```json
+[
+    {
+        "id": 2,
+        "name": "Berger",
+        "status": "active",
+        "number_of_menus": null
+    },
+    {
+        "id": 4,
+        "name": "Food",
+        "status": "active",
+        "number_of_menus": null
+    } 
+]
+```
+#### How to delete a category? <a name="delete-category"></a>
+To delete a category send a `delete` request to `/api/v1/categories/{category_id}`. If you successfully delete a category the API will return.
+
+```json
+{
+    "status": "done",
+    "message": "Record deleted successfully"
+}
+```
+> Note: You should pass a `category_id` you want to delete. 
+#### How to update a category? <a name="update-category"></a>
+
+To update a category send a `put/patch` request to to `/api/v1/categories/{category_id}` and the body of the request looks like
+
+```json
+{
+    "category":{
+       "name": "Berger"
+  }
+}
+```
+
+If you successfuly update a category the API will return 
+```json
+{
+    "id": 2,
+    "name": "Berger",
+    "status": "active",
+    "number_of_menus": 5
+}
+```
+
+> Note: You should pass a `category_id` you want to update
 ### Menus
 ### Orders 
 ### How to get active orders?
