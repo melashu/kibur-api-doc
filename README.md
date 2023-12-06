@@ -20,12 +20,17 @@
       - [How to get a list of menus?](#list-menus)
       - [How to delete a menu?](#delete-menu)
       - [How to update a menu?](#update-menu)
-- [👥 Authors](#authors)
-- [🔭 Future Features](#future-features)
-- [🤝 Contributing](#contributing)
-- [⭐️ Show your support](#support)
-- [🙏 Acknowledgements](#acknowledgements)
-- [📝 License](#license)
+    - [Orders](#orders)
+      - [How to create different orders in one group?](#group-orders) 
+
+      - [How to create separate orders?](#separate-orders)
+
+      - [How to get completed orders?](#completed-orders)
+      - [How to get active orders?](#active-orders)
+      - [How to update active orders?](#update-orders)
+      - [How to delete active orders?](#delete-orders)
+      - [How to get short sales summery?](#short-sales-summery)
+      - [How to get full sales summery?](#full-sales-summery)
 # Kibur api documentation <a name="kibur-api"></a>
 This is a documentation for Kibur API. 
 ## Data format for input and output request <a name="data-format"></a>
@@ -327,6 +332,319 @@ If you successfully update a menu the API will return
 }
 ```
 > Note: Remember you must provide a `menu_id` you want to delete.
-### Orders 
-### How to get active orders?
-### 
+### Orders <a name="orders"></a>
+#### How to create different new orders in one group? <a name="group-orders"></a>
+Every order including a single order will treated with in an order group. So when ever you pass an order it must be an array of order. For example, the casher may want to create different orders in `one` group. To do this you can send `post` request to `/api/v1/orders` and the body of the request should looks like 
+
+```json
+{
+    "casher_name": "Munit",
+    "waiter_name": "Bini",
+    "user_id": 14,
+    "orders": [
+        {
+      "menu_id": 14,
+      "quantity": 4
+       },
+    {
+      "menu_id": 15,
+      "quantity": 6
+    }]
+}
+
+```
+> Note: If you are creating new order you must pass `casher_name`, `waiter_name`, `user_id`, and `orders` attribute. `orders` must be an array of order object and each object must have `menu_id` and `quantity`. `user_id` refers to the user who is responsible to prepare the order, you can get this id from the `menu`.
+
+If order was successfully creates the API response looks like
+
+```json
+{
+    "id": 36,
+    "status": "active",
+    "number_of_orders": 2,
+    "created_at": "2023-12-04T18:58:36.247Z",
+    "updated_at": "2023-12-04T18:58:36.270Z",
+    "casher_name": "Melashu Casher",
+    "waiter_name": "Bini",
+    "created_by": "casher",
+    "user": {
+        "id": 14,
+        "first_name": "Biniam",
+        "last_name": "Amare"
+    },
+    "orders": [
+        {
+            "quantity": 4,
+            "menu": {
+                "name": "Ayenet",
+                "price": 100.0
+            }
+        },
+        {
+            "quantity": 6,
+            "menu": {
+                "name": "Ayenet",
+                "price": 100.0
+            }
+        }
+    ]
+}
+ 
+```
+
+If something went wrong the API will give you proper error message. For example, if you make the menu blank the API will return
+
+```json
+[
+    {
+        "menu": [
+            "must exist"
+        ]
+    }
+]
+```
+
+#### How to add to existing order group? <a name="existing-orders"></a>
+
+Adding new order to the existing order group is the same as creating a new order but the only thing you need to do is pass an `order_group_id` and an array of `orders` with `post` request to `/api/v1/orders`. 
+
+The body of the request should be
+
+```json
+{
+    "order_group_id": 40,
+    "orders": [
+    {
+      "menu_id": 14,
+      "quantity": 4
+    },{
+        "menu_id": 15,
+        "quantity": 10
+    }
+    ]
+}
+```
+> Note, even if you need to add a single order you must pass it as an array of order.
+
+If the order succsfully created, the API will return
+
+```json
+{
+    "id": 40,
+    "status": "active",
+    "number_of_orders": 2,
+    "created_at": "2023-12-04T19:51:24.138Z",
+    "updated_at": "2023-12-04T19:51:24.138Z",
+    "casher_name": "Melashu Casher",
+    "waiter_name": "Bini",
+    "created_by": "casher",
+    "user": {
+        "id": 14,
+        "first_name": "Biniam",
+        "last_name": "Amare"
+    },
+    "orders": [
+        {
+            "quantity": 4,
+            "menu": {
+                "name": "Ayenet",
+                "price": 100.0
+            }
+        },
+        {
+            "quantity": 10,
+            "menu": {
+                "name": "Ayenet",
+                "price": 100.0
+            }
+        }
+    ]
+}
+```
+
+
+#### How to create separate orders? <a name="separate-orders"></a>
+
+Sometimes the casher may want to create a collection of orders separatly in this case you can send a `post` request to `/api/v1/orders/create_single_order`. The body of the request should have the following format
+
+```json
+{
+    "casher_name": "Munit",
+    "waiter_name": "Bini",
+    "user_id": 14,
+    "orders": [{
+      "menu_id": 14,
+      "quantity": 4
+    },{
+      "menu_id": 15,
+      "quantity": 10
+    }]
+}
+```
+
+> Note, all the parameters are required 
+
+If the order succsfully created the API will return
+
+```json
+[
+    {
+        "id": 113,
+        "quantity": 4,
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true
+        },
+        "order_group": {
+            "id": 46,
+            "status": "active",
+            "number_of_orders": 1,
+            "casher_name": "Melashu Casher",
+            "waiter_name": "Bini",
+            "created_by": "casher"
+        }
+    },
+    {
+        "id": 114,
+        "quantity": 10,
+        "menu": {
+            "id": 15,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": false
+        },
+        "order_group": {
+            "id": 47,
+            "status": "active",
+            "number_of_orders": 1,
+            "casher_name": "Melashu Casher",
+            "waiter_name": "Bini",
+            "created_by": "casher"
+        }
+    }
+]
+```
+
+#### How to get completed orders? <a name="completed-orders"></a>
+To get a list of completed orders you can send `get` request to `/api/v1/orders/{from}/{to}`
+
+This end point accepts two optional parameters `from` and `to`. Both must be a `date` or `Datetime` object. Parameter `from` indicates the date order creation starts and parameter `to` indicates the date order creation ends. If you don't pass any value the API will return `todays` completed order.
+
+For example, if you send get requests to `/api/v1/orders/`
+
+> Note, since we didn't pass `from` and `to` parameters the API will return todays completed order.
+
+The API returns 
+
+```json
+[
+    {
+        "id": 46,
+        "status": "completed",
+        "number_of_orders": 1,
+        "created_at": "2023-12-04T20:24:47.476Z",
+        "updated_at": "2023-12-04T20:49:24.013Z",
+        "casher_name": "Melashu Casher",
+        "waiter_name": "Bini",
+        "created_by": "casher",
+        "user": {
+            "id": 14,
+            "first_name": "Biniam",
+            "last_name": "Amare",
+            "role": "food"
+        },
+        "orders": [
+            {
+                "quantity": 4,
+                "menu": {
+                    "name": "Ayenet",
+                    "price": 100.0
+                }
+            }
+        ]
+    }
+]
+```
+If you want to pass `from` and `to` parameters, you can do like 
+
+`/api/v1/orders/Mon, 05 Dec 2023/Mon, 06 Dec 2023`
+
+The first one indicates the start date and the second one indicates the end date. 
+
+> Note: For `admin` user this endpoint returns `all` `completed` orders but for `non-admin` users(cashers) it only return orders created by their own. 
+
+#### How to get active orders? <a name="active-orders"></a>
+The adminstrator and inside workers may need to access active orders. To get active orders you can send `get` request to  `api/v1/active/orders/{:user_id}`.
+> Here `user_id` is an optional parameter.
+
+To display the active orders to admin user just send `get` request to `api/v1/active/orders` with out `user_id` and if you want to fetch active order belongs to specific user just pass a `user_id` parameter.
+
+Casher's need to access their active orders, so you can send `get` request to `api/v1/my/active/orders`
+
+#### How to update active orders? <a name="update-orders"></a>
+When the inside worker withdraw the order they need to confirm the order as completed. To do this you can send `put` request to `api/v1/approve/:id`. The `id` parameter refers the order group id that we need to change the status to completed.
+
+For example,
+
+Sending `put` request to `api/v1/approve/28` returns 
+
+```json
+{
+    "id": 28,
+    "status": "completed",
+    "number_of_orders": 2,
+    "casher_name": "Munita",
+    "waiter_name": "Bini",
+    "approved_by": "Eden",
+    "orders": [
+        {
+            "id": 50,
+            "quantity": 4
+        },
+        {
+            "id": 51,
+            "quantity": 6
+        }
+    ]
+}
+```
+> Note: the id parameter is required parameter. 
+
+In case the casher want to update the order group, you can send `put` request to `/api/v1/order_groups/:id`.
+
+For example, if you want to update the waiter name for a given order group, send `put` request to `/api/v1/order_groups/45` and the body of the request should looks like
+
+```json
+{
+    "order_group": {
+        "waiter_name": "Solomon"
+    }
+}
+```
+If order group successfully updated then the API will return 
+```json
+{
+    "id": 45,
+    "status": "active",
+    "number_of_orders": 1,
+    "casher_name": "Melashu Casher",
+    "waiter_name": "Solomon",
+    "approved_by": null,
+    "orders": [
+        {
+            "id": 112,
+            "quantity": 10,
+        }
+    ]
+}
+```
+Sometime it may be required to update indvisual order with in an order group. 
+ For such cases, you can send `put` request to `/api/v1/orders/:id`
+> Note: The `id` parameter is required.
+#### How to delete active orders? <a name="delete-orders"></a>
+
+#### How to get short sales summery? <a name="short-sales-summery"></a>
+
+#### How to get full sales summery? <a name="full-sales-summery"></a>
