@@ -334,7 +334,7 @@ If you successfully update a menu the API will return
 > Note: Remember you must provide a `menu_id` you want to delete.
 ### Orders <a name="orders"></a>
 #### How to create different new orders in one group? <a name="group-orders"></a>
-Every order including a single order will treated with in an order group. So when ever you pass an order it must be an array of order. For example, the casher may want to create different orders in `one` group. To do this you can send `post` request to `/api/v1/orders` and the body of the request should looks like 
+Every order including a single order will treated with in an order group. So when ever you pass an order it must be an array of order. For example, the cashiers may want to create different orders in `one` group. To do this you can send `post` request to `/api/v1/orders` and the body of the request should looks like 
 
 ```json
 {
@@ -581,7 +581,7 @@ The adminstrator and inside workers may need to access active orders. To get act
 
 To display the active orders to admin user just send `get` request to `api/v1/active/orders` with out `user_id` and if you want to fetch active order belongs to specific user just pass a `user_id` parameter.
 
-Casher's need to access their active orders, so you can send `get` request to `api/v1/my/active/orders`
+If Cashiers need to access their active orders, so you can send `get` request to `api/v1/my/active/orders`
 
 #### How to update active orders? <a name="update-orders"></a>
 When the inside worker withdraw the order they need to confirm the order as completed. To do this you can send `put` request to `api/v1/approve/{id}`. The `id` parameter refers the order group id that we need to change the status to completed.
@@ -712,7 +712,7 @@ If the order successfully deleted the API will return
 The admin and the casher may want to see short current day order summery, In such case you can send request to `/api/v1/orders/total_order_summery/{user_name}`
 
 
-> Note: Here `user_name` parameter is an optional parameter if you didn't include user name in your request, the API considers the request comes from the admin user and return the summery of orders created by different casher.
+> Note: Please note that the `user_name` parameter is optional. If you omit the `user_name` parameter in your request, the API will assume you are an admin user and return a summary of orders created by different cashiers.
 
 for example if you send a request `get` to
 `/api/v1/orders/total_order_summery`, the api consider this request is from the adminuser and it returns 
@@ -723,7 +723,7 @@ for example if you send a request `get` to
     "total_order_amount": 26500.0
 }
 ```
-If you include a `casher's` user_name on your request the API returns the short summary which belongs to a specific casher.
+If you include a `cashiers's` user_name on your request the API returns the short summary which belongs to a specific cashiers.
 
 For example if you send a `get` request to 
 `/api/v1/orders/total_order_summery/mitu` the API returns
@@ -736,4 +736,62 @@ For example if you send a `get` request to
 ```
 
 #### How to get full sales summery? <a name="full-sales-summery"></a>
+
+The admin(owner) of the system wants to get full sales report categorized by the menu items, to get this report you can send `get` request to 
+`/api/v1/orders/sales_order_summery/{from}/{to}`
+
+> Note: This endpoint accepts two options parameters `from` and `to` both are either date or datetime object, if you did not specify both parameters the API will return current day sales report
+
+For example if you send `get` request to `/api/v1/orders/sales_order_summery/` then the API will return
+```json
+{
+    "Ayenet": {
+        "total_order": 2,
+        "total_sale": 400.0
+    },
+    "Tegabino": {
+        "total_order": 1,
+        "total_sale": 150.0
+    },
+    "Shero": {
+        "total_order": 1,
+        "total_sale": 120.0
+    }
+}
+```
+
+If you pass only one parameter in your request the API consider that parameter as the starting date (as `from`) and consider `to` as the end of current day  
+
+For example, if you send get request to 
+
+`/api/v1/orders/sales_order_summery/"Thu, 30 Nov 2023"/`
+
+The api consider `from` as
+`Thu, 30 Nov 2023` and `to` as `Thu, 07 Dec 2023` 
+
+> Please consider this doc has been writen `Thu, 07 Dec 2023`
+
+so the API return 
+
+```json
+{
+   
+    "Ayenet": {
+        "total_order": 30,
+        "total_sale": 6000.0
+    },
+    "Tegabino": {
+        "total_order": 20,
+        "total_sale": 3000.0
+    },
+    "Shero": {
+        "total_order": 50,
+        "total_sale": 6000.0
+    },
+    "Ferefer": {
+         "total_order": 50,
+        "total_sale": 5000.0 
+    }
+}
+```
 
