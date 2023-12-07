@@ -41,6 +41,7 @@ For every `POST` and `PUT/PATCH` requests, you can provide data in JSON format. 
 ```
 
 ## API Endpoints <a name="endpoint"></a>
+> Note: For Every endpoint user `https://kibur.onrender.com` as a root URL.
 ### Authentication <a name="auth"></a>
 #### How to get the API KEY? <a name="api-key"></a>
 To get the api key you need to authenticate using `user_name` and `password` and send `get` request to
