@@ -584,7 +584,7 @@ To display the active orders to admin user just send `get` request to `api/v1/ac
 Casher's need to access their active orders, so you can send `get` request to `api/v1/my/active/orders`
 
 #### How to update active orders? <a name="update-orders"></a>
-When the inside worker withdraw the order they need to confirm the order as completed. To do this you can send `put` request to `api/v1/approve/:id`. The `id` parameter refers the order group id that we need to change the status to completed.
+When the inside worker withdraw the order they need to confirm the order as completed. To do this you can send `put` request to `api/v1/approve/{id}`. The `id` parameter refers the order group id that we need to change the status to completed.
 
 For example,
 
@@ -610,9 +610,9 @@ Sending `put` request to `api/v1/approve/28` returns
     ]
 }
 ```
-> Note: the id parameter is required parameter. 
+> Note: the `id` parameter is required parameter. 
 
-In case the casher want to update the order group, you can send `put` request to `/api/v1/order_groups/:id`.
+In case the casher want to update the order group, you can send `put` request to `/api/v1/order_groups/{id}`.
 
 For example, if you want to update the waiter name for a given order group, send `put` request to `/api/v1/order_groups/45` and the body of the request should looks like
 
@@ -641,10 +641,99 @@ If order group successfully updated then the API will return
 }
 ```
 Sometime it may be required to update indvisual order with in an order group. 
- For such cases, you can send `put` request to `/api/v1/orders/:id`
+ For such cases, you can send `put` request to `/api/v1/orders/{id}` and the body of the request should have the following format.
+
+For example, lets update the quantity of an order. Send `put` request to 
+
+`/api/v1/orders/52`
+
+ ```json
+ {
+    "order": {
+        "quantity": 2
+    }
+}
+ ```
+
+ If the order was successfully updated then the API will return 
+ ```json
+{
+    "id": 52,
+    "quantity": 1,
+    "menu": {
+        "id": 14,
+        "name": "Ayenet",
+        "price": 100.0,
+        "pin_to_top": true,
+        "created_by": "Munit Amare"
+    },
+    "order_group": {
+        "id": 29,
+        "number_of_orders": 2,
+        "waiter_name": "Bini"
+    }
+}
+ ```
 > Note: The `id` parameter is required.
 #### How to delete active orders? <a name="delete-orders"></a>
 
+Sometimes the casher may want to delete the order group or indvidual orders.
+
+If the casher want to delete a specific order group, then you can send `delete` request to `/api/v1/order_groups/{id}`
+
+for example, send `delete` request to `/api/v1/order_groups/9`
+
+If the order group successfully deleted, the API will return 
+
+```json
+{
+    "status": "done",
+    "message": "Record deleted successfully"
+}
+```
+If the casher want to delete specific order, then you can send `delete` request to `/api/v1/orders/{id}` 
+
+for example, send `delete` request  to 
+`/api/v1/orders/53`
+
+If the order successfully deleted the API will return 
+
+```json
+{
+    "status": "done",
+    "message": "Record deleted successfully"
+}
+```
+
+> Note: the `id` parameter is required parameter. 
+
 #### How to get short sales summery? <a name="short-sales-summery"></a>
 
+The admin and the casher may want to see short current day order summery, In such case you can send request to `/api/v1/orders/total_order_summery/{user_name}`
+
+
+> Note: Here `user_name` parameter is an optional parameter if you didn't include user name in your request, the API considers the request comes from the admin user and return the summery of orders created by different casher.
+
+for example if you send a request `get` to
+`/api/v1/orders/total_order_summery`, the api consider this request is from the adminuser and it returns 
+
+```json
+{
+    "total_order": 60,
+    "total_order_amount": 26500.0
+}
+```
+If you include a `casher's` user_name on your request the API returns the short summary which belongs to a specific casher.
+
+For example if you send a `get` request to 
+`/api/v1/orders/total_order_summery/mitu` the API returns
+
+```json
+{
+    "total_order": 36,
+    "total_order_amount": 13056.0
+}
+```
+
 #### How to get full sales summery? <a name="full-sales-summery"></a>
+
