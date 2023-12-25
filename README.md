@@ -27,10 +27,18 @@
 
       - [How to get completed orders?](#completed-orders)
       - [How to get active orders?](#active-orders)
-      - [How to update active orders?](#update-orders)
-      - [How to delete active orders?](#delete-orders)
       - [How to get short sales summery?](#short-sales-summery)
       - [How to get full sales summery?](#full-sales-summery)
+      - [How to cancel all orders (for worker only](#cancel-group-order)
+      - [How to cancel a single order (for worker only)](#cancel-single-order)
+      - [How to update a single order (for casher only)](#update-single-order)
+      - [How to update a group orders (for casher only)](#update-group-order)
+      - [How to checkout completed orders (for worker only)](#checkout-complete-order)
+      - [How to get canceled order?(for admin only)](#canceled-orders)
+      - [How to get edited order?(for admin only)](#edited-orders)
+      - [How to get my order for casher only?](#my-order)
+
+
 # Kibur api documentation <a name="kibur-api"></a>
 This is a documentation for Kibur API. 
 ## Data format for input and output request <a name="data-format"></a>
@@ -528,7 +536,426 @@ If the order succsfully created the API will return
 ]
 ```
 
-#### How to get completed orders? <a name="completed-orders"></a>
+#### How to cancel all orders (for worker only) <a name="cancel-group-order"></a>
+
+All order is organized using order group and only a user who have worker role can cancel the a give order group. To cancel order group send `put` request to `/api/v1/order_groups/{order_group_id}/cancel`
+
+Note: You must pass `order_group_id` that you want to cancel.
+
+For example send `put` request to `/api/v1/order_groups/8/cancel`
+
+If the request is successful the API will return 
+
+
+```json
+{
+    "id": 8,
+    "status": "canceled",
+    "number_of_orders": 2,
+    "casher_name": "Munita",
+    "waiter_name": "Sharon",
+    "approved_by": "Munit Amare",
+    "updated_at": "2023-12-25T18:29:29.562Z",
+    "created_at": "2023-12-25T15:06:22.087Z",
+    "orders": [
+        {
+            "id": 20,
+            "quantity": 2,
+            "created_at": "2023-12-25T15:06:22.087Z",
+            "updated_at": "2023-12-25T18:29:29.540Z"
+        },
+        {
+            "id": 21,
+            "quantity": 2,
+            "created_at": "2023-12-25T15:06:22.087Z",
+            "updated_at": "2023-12-25T18:29:29.560Z"
+        }
+    ]
+}
+```
+
+#### How to cancel a single order (for worker only) <a name="cancel-single-order"></a>
+Sometimes it may be required to cancel a single order so a worker can cancel a single order.
+
+To do this send `put` request to `/api/v1/orders/{id}/cancel`
+
+Note: `id` refers to the order you want to cancel
+
+for example send `put` request to `/api/v1/orders/24/cancel`
+
+If the request successfully cancels a single order, the API will return
+
+```json
+{
+    "status": "canceled",
+    "quantity": 2,
+    "id": 24,
+    "created_at": "2023-12-25T15:06:22.087Z",
+    "updated_at": "2023-12-25T18:38:04.543Z",
+    "menu": {
+        "id": 10,
+        "name": "Ayent",
+        "price": 100.0,
+        "pin_to_top": true,
+        "created_by": "Munit Amare"
+    },
+    "order_group": {
+        "id": 10,
+        "number_of_orders": 2,
+        "waiter_name": "Fekadu"
+    }
+}
+```
+
+
+#### How to update a single order (for casher only) <a name="update-single-order"></a>
+Sometimes the casher may want to update a single order, to do this you can send a `put` request to `/api/v1/orders/{id}`
+
+and the body of the request should looks like 
+
+```json
+{
+   "order":{
+       ---
+    }
+}
+```
+
+For example id you can send a `put` request to `/api/v1/orders/129` and the body of the request will look like
+
+```json
+```json
+{
+   "order":{
+       "quantity": 4
+    }
+}
+```
+
+If the request succssfully completes the API will return 
+
+```json
+{
+    "quantity": 4,
+    "id": 129,
+    "created_at": "2023-12-25T15:06:22.087Z",
+    "updated_at": "2023-12-25T18:48:20.505Z",
+    "status": "canceled",
+    "menu": {
+        "id": 26,
+        "name": "Shero",
+        "price": 120.0,
+        "pin_to_top": true,
+        "created_by": "Munit Amare"
+    },
+    "order_group": {
+        "id": 51,
+        "number_of_orders": 2,
+        "waiter_name": "Bini"
+    }
+}
+```
+
+#### How to update a group orders (for casher only) <a name="update-group-order"></a>
+
+
+#### How to checkout completed orders (for worker only) <a name="checkout-complete-order"></a>
+When order is created the status of the order considered as completed but it is required to check out as the order is delivered.
+ To do so you can send `put` request to `/api/v1/order_groups/{order_group_id}/order_completed`
+
+ For example to checkout the a give order group send `put` request to `/api/v1/order_groups/11/order_completed` and if the request is successful the API will return
+
+ ```json
+ {
+    "id": 11,
+    "status": "out",
+    "number_of_orders": 2,
+    "casher_name": "Aya",
+    "waiter_name": "Fekadu",
+    "approved_by": "Munit Amare",
+    "updated_at": "2023-12-25T19:22:42.823Z",
+    "created_at": "2023-12-25T15:06:22.087Z",
+    "orders": [
+        {
+            "id": 26,
+            "quantity": 2,
+            "created_at": "2023-12-25T15:06:22.087Z",
+            "updated_at": "2023-12-25T15:06:22.087Z",
+            "status": "completed"
+        },
+        {
+            "id": 27,
+            "quantity": 2,
+            "created_at": "2023-12-25T15:06:22.087Z",
+            "updated_at": "2023-12-25T15:06:22.087Z",
+            "status": "completed"
+        }
+    ]
+}
+ ```
+#### How to get canceled order?(for admin only) <a name="canceled-orders"></a>
+The admin wanted to know the all canceled orders to get this you can send `get` request to `/api/v1/canceled/order(/:from)(/:to)`
+
+> Note: This endpoint accepts two options parameters `from` and `to` both are either date or datetime object, if you did not specify both parameters the API will return current day canceled report. 
+
+for example if you send `get` request to `/api/v1/canceled/order` the API will return todays canceled report.
+
+```json
+[
+    {
+        "id": 128,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "canceled",
+        "menu": {
+            "id": 27,
+            "name": "Tegabino",
+            "price": 120.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 51,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munit Amare",
+            "waiter_name": "Bini",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T18:48:20.507Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 31,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "canceled",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 14,
+            "status": "canceled",
+            "number_of_orders": 1,
+            "casher_name": "Aya",
+            "waiter_name": "Fekadu",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T17:13:14.583Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 111,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "canceled",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 44,
+            "status": "canceled",
+            "number_of_orders": 1,
+            "casher_name": "Melashu Casher",
+            "waiter_name": "Bini",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T15:06:57.076Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 20,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:29:29.540Z",
+        "status": "canceled",
+        "menu": {
+            "id": 10,
+            "name": "Ayent",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 8,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munita",
+            "waiter_name": "Sharon",
+            "approved_by": "Munit Amare",
+            "updated_at": "2023-12-25T18:29:29.562Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 21,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:29:29.560Z",
+        "status": "canceled",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 8,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munita",
+            "waiter_name": "Sharon",
+            "approved_by": "Munit Amare",
+            "updated_at": "2023-12-25T18:29:29.562Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 24,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:38:04.543Z",
+        "status": "canceled",
+        "menu": {
+            "id": 10,
+            "name": "Ayent",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 10,
+            "status": "edited",
+            "number_of_orders": 2,
+            "casher_name": "Munita",
+            "waiter_name": "Fekadu",
+            "approved_by": null,
+            "updated_at": "2023-12-25T18:38:04.547Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 129,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:48:20.505Z",
+        "status": "canceled",
+        "menu": {
+            "id": 26,
+            "name": "Shero",
+            "price": 120.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 51,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munit Amare",
+            "waiter_name": "Bini",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T18:48:20.507Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    }
+]
+```
+#### How to get edited order?(for admin only) <a name="edited-orders"></a>
+The admin wanted to know the all edited orders to get this you can send `get` request to `api/v1/edited/order/(:from)/(:to)`
+
+> Note: This endpoint accepts two options parameters `from` and `to` both are either date or datetime object, if you did not specify both parameters the API will return today edited report. 
+
+for example if you send `get` request to `/api/v1/edited/order` the API will return todays canceled report.
+
+```json
+[
+    {
+        "id": 56,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "edited",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 31,
+            "status": "edited",
+            "number_of_orders": 2,
+            "casher_name": "Melashu Casher",
+            "waiter_name": "Meshu",
+            "approved_by": "Munit Amare",
+            "updated_at": "2023-12-25T15:06:56.883Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    }
+      
+]
+```
+
+#### How to get my order for casher only? <a name="my-order"></a>
+The casher want to know all orders they created, to get this you can send `get` request to `api/v1/my/active/orders` 
+
+for example if you send a `get` request to `api/v1/my/active/orders` the server will return
+
+```json
+[
+    {
+        "id": 21,
+        "status": "completed",
+        "number_of_orders": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:56.009Z",
+        "casher_name": "Munit Amare",
+        "waiter_name": "Fekadu",
+        "created_by": "mitu",
+        "user": {
+            "id": 14,
+            "first_name": "Biniam",
+            "last_name": "Amare"
+        },
+        "orders": [
+            {
+                "id": 38,
+                "quantity": 2,
+                "menu": {
+                    "id": 10,
+                    "name": "Ayent",
+                    "price": 100.0
+                }
+            },
+            {
+                "id": 39,
+                "quantity": 2,
+                "menu": {
+                    "id": 14,
+                    "name": "Ayenet",
+                    "price": 100.0
+                }
+            }
+        ]
+    }
+]
+```
+
+
+#### How to get completed orders?(for admin only) <a name="completed-orders"></a>
 To get a list of completed orders you can send `get` request to `/api/v1/orders/{from}/{to}`
 
 This end point accepts two optional parameters `from` and `to`. Both must be a `date` or `Datetime` object. Parameter `from` indicates the date order creation starts and parameter `to` indicates the date order creation ends. If you don't pass any value the API will return `todays` completed order.
@@ -576,144 +1003,48 @@ The first one indicates the start date and the second one indicates the end date
 
 > Note: For `admin` user this endpoint returns `all` `completed` orders but for `non-admin` users(cashers) it only return orders created by their own. 
 
-#### How to get active orders? <a name="active-orders"></a>
-The adminstrator and inside workers may need to access active orders. To get active orders you can send `get` request to  `api/v1/active/orders/{:user_id}`.
-> Here `user_id` is an optional parameter.
+#### How to get active orders?(for worker only) <a name="active-orders"></a>
+The workers want to access to get active orders which belongs to them so you can send `get` request to `/api/v1/orders/active_order`.
 
-To display the active orders to admin user just send `get` request to `api/v1/active/orders` with out `user_id` and if you want to fetch active order belongs to specific user just pass a `user_id` parameter.
+ For example if you send `get` request to `/api/v1/orders/active_order`, the API will return
 
-If Cashiers need to access their active orders, so you can send `get` request to `api/v1/my/active/orders`
-
-#### How to update active orders? <a name="update-orders"></a>
-When the inside worker withdraw the order they need to confirm the order as completed. To do this you can send `put` request to `api/v1/approve/{id}`. The `id` parameter refers the order group id that we need to change the status to completed.
-
-For example,
-
-Sending `put` request to `api/v1/approve/28` returns 
-
-```json
-{
-    "id": 28,
-    "status": "completed",
-    "number_of_orders": 2,
-    "casher_name": "Munita",
-    "waiter_name": "Bini",
-    "approved_by": "Eden",
-    "orders": [
-        {
-            "id": 50,
-            "quantity": 4
+ ```json
+ [
+   
+    {
+        "id": 16,
+        "status": "completed",
+        "number_of_orders": 1,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T17:13:14.560Z",
+        "casher_name": "Aya",
+        "waiter_name": "Fekadu",
+        "created_by": "aya",
+        "user": {
+            "id": 11,
+            "first_name": "Munit",
+            "last_name": "Amare",
+            "role": "admin"
         },
-        {
-            "id": 51,
-            "quantity": 6
-        }
-    ]
-}
-```
-> Note: the `id` parameter is required parameter. 
-
-In case the casher want to update the order group, you can send `put` request to `/api/v1/order_groups/{id}`.
-
-For example, if you want to update the waiter name for a given order group, send `put` request to `/api/v1/order_groups/45` and the body of the request should looks like
-
-```json
-{
-    "order_group": {
-        "waiter_name": "Solomon"
+        "orders": [
+            {
+                "id": 33,
+                "quantity": 2,
+                "menu": {
+                    "id": 14,
+                    "name": "Ayenet",
+                    "price": 100.0
+                }
+            }
+        ]
     }
-}
-```
-If order group successfully updated then the API will return 
-```json
-{
-    "id": 45,
-    "status": "active",
-    "number_of_orders": 1,
-    "casher_name": "Melashu Casher",
-    "waiter_name": "Solomon",
-    "approved_by": null,
-    "orders": [
-        {
-            "id": 112,
-            "quantity": 10,
-        }
-    ]
-}
-```
-Sometime it may be required to update indvisual order with in an order group. 
- For such cases, you can send `put` request to `/api/v1/orders/{id}` and the body of the request should have the following format.
-
-For example, lets update the quantity of an order. Send `put` request to 
-
-`/api/v1/orders/52`
-
- ```json
- {
-    "order": {
-        "quantity": 2
-    }
-}
+]
  ```
-
- If the order was successfully updated then the API will return 
- ```json
-{
-    "id": 52,
-    "quantity": 1,
-    "menu": {
-        "id": 14,
-        "name": "Ayenet",
-        "price": 100.0,
-        "pin_to_top": true,
-        "created_by": "Munit Amare"
-    },
-    "order_group": {
-        "id": 29,
-        "number_of_orders": 2,
-        "waiter_name": "Bini"
-    }
-}
- ```
-> Note: The `id` parameter is required.
-#### How to delete active orders? <a name="delete-orders"></a>
-
-Sometimes the casher may want to delete the order group or indvidual orders.
-
-If the casher want to delete a specific order group, then you can send `delete` request to `/api/v1/order_groups/{id}`
-
-for example, send `delete` request to `/api/v1/order_groups/9`
-
-If the order group successfully deleted, the API will return 
-
-```json
-{
-    "status": "done",
-    "message": "Record deleted successfully"
-}
-```
-If the casher want to delete specific order, then you can send `delete` request to `/api/v1/orders/{id}` 
-
-for example, send `delete` request  to 
-`/api/v1/orders/53`
-
-If the order successfully deleted the API will return 
-
-```json
-{
-    "status": "done",
-    "message": "Record deleted successfully"
-}
-```
-
-> Note: the `id` parameter is required parameter. 
 
 #### How to get short sales summery? <a name="short-sales-summery"></a>
 
-The admin and the casher may want to see short current day order summery, In such case you can send request to `/api/v1/orders/total_order_summery/{user_name}`
+The admin and the casher may want to see short current day order summery, In such case you can send request to `/api/v1/orders/total_order_summery`
 
-
-> Note: Please note that the `user_name` parameter is optional. If you omit the `user_name` parameter in your request, the API will assume you are an admin user and return a summary of orders created by different cashiers.
 
 for example if you send a request `get` to
 `/api/v1/orders/total_order_summery`, the api consider this request is from the adminuser and it returns 
@@ -724,41 +1055,186 @@ for example if you send a request `get` to
     "total_order_amount": 26500.0
 }
 ```
-If you include a `cashiers's` user_name on your request the API returns the short summary which belongs to a specific cashiers.
-
-For example if you send a `get` request to 
-`/api/v1/orders/total_order_summery/mitu` the API returns
-
-```json
-{
-    "total_order": 36,
-    "total_order_amount": 13056.0
-}
-```
 
 #### How to get full sales summery? <a name="full-sales-summery"></a>
 
 The admin(owner) of the system wants to get full sales report categorized by the menu items, to get this report you can send `get` request to 
-`/api/v1/orders/sales_order_summery/{from}/{to}`
+`api/v1/orders/sales/order/summery/(:from)/(:to)`
 
 > Note: This endpoint accepts two options parameters `from` and `to` both are either date or datetime object, if you did not specify both parameters the API will return current day sales report
 
-For example if you send `get` request to `/api/v1/orders/sales_order_summery/` then the API will return
+For example if you send `get` request to `/api/v1/orders/sales/order/summery/` then the API will return
 ```json
-{
-    "Ayenet": {
-        "total_order": 2,
-        "total_sale": 400.0
+[
+    {
+        "id": 128,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "canceled",
+        "menu": {
+            "id": 27,
+            "name": "Tegabino",
+            "price": 120.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 51,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munit Amare",
+            "waiter_name": "Bini",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T18:48:20.507Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
     },
-    "Tegabino": {
-        "total_order": 1,
-        "total_sale": 150.0
+    {
+        "id": 31,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "canceled",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 14,
+            "status": "canceled",
+            "number_of_orders": 1,
+            "casher_name": "Aya",
+            "waiter_name": "Fekadu",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T17:13:14.583Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
     },
-    "Shero": {
-        "total_order": 1,
-        "total_sale": 120.0
+    {
+        "id": 111,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T15:06:22.087Z",
+        "status": "canceled",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 44,
+            "status": "canceled",
+            "number_of_orders": 1,
+            "casher_name": "Melashu Casher",
+            "waiter_name": "Bini",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T15:06:57.076Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 20,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:29:29.540Z",
+        "status": "canceled",
+        "menu": {
+            "id": 10,
+            "name": "Ayent",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 8,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munita",
+            "waiter_name": "Sharon",
+            "approved_by": "Munit Amare",
+            "updated_at": "2023-12-25T18:29:29.562Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 21,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:29:29.560Z",
+        "status": "canceled",
+        "menu": {
+            "id": 14,
+            "name": "Ayenet",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 8,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munita",
+            "waiter_name": "Sharon",
+            "approved_by": "Munit Amare",
+            "updated_at": "2023-12-25T18:29:29.562Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 24,
+        "quantity": 2,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:38:04.543Z",
+        "status": "canceled",
+        "menu": {
+            "id": 10,
+            "name": "Ayent",
+            "price": 100.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 10,
+            "status": "edited",
+            "number_of_orders": 2,
+            "casher_name": "Munita",
+            "waiter_name": "Fekadu",
+            "approved_by": null,
+            "updated_at": "2023-12-25T18:38:04.547Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
+    },
+    {
+        "id": 129,
+        "quantity": 4,
+        "created_at": "2023-12-25T15:06:22.087Z",
+        "updated_at": "2023-12-25T18:48:20.505Z",
+        "status": "canceled",
+        "menu": {
+            "id": 26,
+            "name": "Shero",
+            "price": 120.0,
+            "pin_to_top": true,
+            "created_by": "Munit Amare"
+        },
+        "order_group": {
+            "id": 51,
+            "status": "canceled",
+            "number_of_orders": 2,
+            "casher_name": "Munit Amare",
+            "waiter_name": "Bini",
+            "approved_by": "Biniam Amare",
+            "updated_at": "2023-12-25T18:48:20.507Z",
+            "created_at": "2023-12-25T15:06:22.087Z"
+        }
     }
-}
+]
 ```
 
 If you pass only one parameter in your request the API consider that parameter as the starting date (as `from`) and consider `to` as the end of current day  
@@ -776,22 +1252,39 @@ so the API return
 
 ```json
 {
-   
-    "Ayenet": {
-        "total_order": 30,
-        "total_sale": 6000.0
+    "Eden": {
+        "Ayenet": {
+            "total_order": 70,
+            "total_sale": 43900.0
+        }
     },
-    "Tegabino": {
-        "total_order": 20,
-        "total_sale": 3000.0
+    "Fenet": {
+        "Ayent": {
+            "total_order": 6,
+            "total_sale": 1200.0
+        },
+        "Ayenet": {
+            "total_order": 5,
+            "total_sale": 1000.0
+        }
     },
-    "Shero": {
-        "total_order": 50,
-        "total_sale": 6000.0
-    },
-    "Ferefer": {
-         "total_order": 50,
-        "total_sale": 5000.0 
+    "Munika": {
+        "Ayent": {
+            "total_order": 6,
+            "total_sale": 1200.0
+        },
+        "Ayenet": {
+            "total_order": 8,
+            "total_sale": 2200.0
+        },
+        "Tegabino": {
+            "total_order": 1,
+            "total_sale": 480.0
+        },
+        "Shero": {
+            "total_order": 1,
+            "total_sale": 720.0
+        }
     }
 }
 ```
